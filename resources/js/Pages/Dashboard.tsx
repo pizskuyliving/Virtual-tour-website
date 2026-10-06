@@ -1,6 +1,6 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import InputError from "@/Components/InputError";
-import Navbar from "@/Components/Navbar";
+import Footer from "@/Components/Footer";
 import {
     AlertDialog,
     AlertDialogAction,
@@ -23,7 +23,7 @@ import {
 import { Input } from "@/Components/ui/input";
 import { Label } from "@/Components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { PageProps } from "@/types";
+import { PageProps } from "@/types/index";
 import { Head, useForm, usePage } from "@inertiajs/react";
 import { Pencil, Plus, Trash2 } from "lucide-react";
 import { FormEvent, useEffect, useState } from "react";
@@ -105,204 +105,205 @@ export default function Dashboard() {
     };
 
     return (
-        <AuthenticatedLayout
-            header={
-                <h2 className="text-xl font-semibold leading-tight text-gray-800">
-                    Dashboard
-                </h2>
-            }
-        >
-            <Head title="Dashboard" />
+        
+        <>
+            <AuthenticatedLayout
+                header={
+                    <h2 className="text-xl font-semibold leading-tight text-gray-800">
+                        Dashboard
+                    </h2>
+                }
+            >
+                <Head title="Dashboard" />
 
-            <div className="py-12">
-                <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
-                    <Card className="w-full max-w-8xl mx-auto">
-                        <CardHeader>
-                            <CardTitle>
-                                {!!editedRoom ? "Edit" : "Tambah"} Ruangan
-                            </CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <form
-                                onSubmit={handleAdd}
-                                className="flex flex-col mb-4  max-w-80"
-                                encType="multipart/form-data"
-                            >
-                                <div className="mb-4">
-                                    <Label htmlFor="picture">Ruangan</Label>
-                                    <Input
-                                        type="text"
-                                        placeholder="Nama Ruangan"
-                                        required
-                                        name="name"
-                                        value={data.name}
-                                        onChange={(e) =>
-                                            setData("name", e.target.value)
-                                        }
-                                        className="flex-grow"
-                                    />
-                                </div>
-                                <div className="mb-4">
-                                    <Label htmlFor="picture">Upload 3D Vista</Label>
-                                    <Input
-                                        id="picture"
-                                        type="file"
-                                        name="file"
-                                        accept="*zip*"
-                                        onChange={(e) => {
-                                            if (e.target.files) {
-                                                setData(
-                                                    "file",
-                                                    e.target.files[0]
-                                                );
-                                            }
-                                        }}
-                                    />
-                                    <InputError
-                                        message={errors.file}
-                                        className="mt-2"
-                                    />
-                                </div>
-                                <div className="mb-4">
-                                    <Label htmlFor="picture">Upload Cover</Label>
-                                    <Input
-                                        id="picture"
-                                        type="file"
-                                        name="cover"
-                                        accept="image/*"
-                                        onChange={(e) => {
-                                            if (e.target.files) {
-                                                setData(
-                                                    "cover",
-                                                    e.target.files[0]
-                                                );
-                                            }
-                                        }}
-                                    />
-                                    <InputError
-                                        message={errors.cover}
-                                        className="mt-2"
-                                    />
-                                </div>
-                                {/* <div className="mb-4">
-                                    <Label htmlFor="picture">Deskripsi</Label>
-                                    <textarea
-                                        placeholder="Deskripsi Ruangan"
-                                        required
-                                        name="description"
-                                        value={data.description}
-                                        onChange={(e) =>
-                                            setData(
-                                                "description",
-                                                e.target.value
-                                            )
-                                        }
-                                        rows={3}
-                                        className="flex-grow block w-full border-1 border-gray-300 rounded-sm text-sm"
-                                    />
-                                    <InputError
-                                        message={errors.description}
-                                        className="mt-2"
-                                    />
-                                </div> */}
-                                <div className="flex justify-end items-center space-x-4">
-                                    <Button variant="secondary">Batal</Button>
-                                    <Button type="submit" disabled={processing}>
-                                        <Plus className="h-4 w-4" />
-                                        <span className="ml-2">
-                                            {!!editedRoom ? "Edit" : "Tambah"}
-                                        </span>
-                                    </Button>
-                                </div>
-                            </form>
-                        </CardContent>
-                        <CardHeader>
-                            <CardTitle>Daftar Ruangan</CardTitle>
-                        </CardHeader>
-                        <CardContent className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                            {rooms.length === 0 && (
-                                <p className="text-center">Tidak ada ruangan</p>
-                            )}
-                            {rooms.map((room) => (
-                                <Card
-                                    key={room.id}
-                                    className="flex flex-col overflow-hidden"
+                <div className="py-12">
+                    <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
+                        <Card className="w-full max-w-8xl mx-auto">
+                            <CardHeader>
+                                <CardTitle>
+                                    {!!editedRoom ? "Edit" : "Tambah"} Ruangan
+                                </CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                                <form
+                                    onSubmit={handleAdd}
+                                    className="flex flex-col mb-4  max-w-80"
+                                    encType="multipart/form-data"
                                 >
-                                    <div
-                                        className="aspect-w-1 aspect-h-1 w-full relative transition-all overflow-hidden hover:scale-105"
-                                        style={{
-                                            backgroundImage: `url('${room.cover}')`,
-                                            height: "200px",
-                                            backgroundSize: "cover",
-                                            backgroundPosition: "center",
-                                        }}
-                                    ></div>
-                                    <CardContent className="p-4 flex-grow">
-                                        <h2 className="text-lg font-semibold mb-2">
-                                            {room.name}
-                                        </h2>
-                                        {/* <p className="text-sm text-gray-500">
-                                            {room.description}
-                                        </p> */}
-                                    </CardContent>
-                                    <CardFooter className="p-4 pt-0 mt-auto">
-                                        <div className="flex w-full space-x-2">
-                                            <Button
-                                                className="flex-1 bg-green-700"
-                                                onClick={() =>
-                                                    setEditedRoom(room)
+                                    <div className="mb-4">
+                                        <Label htmlFor="picture">Ruangan</Label>
+                                        <Input
+                                            type="text"
+                                            placeholder="Nama Ruangan"
+                                            required
+                                            name="name"
+                                            value={data.name}
+                                            onChange={(e) =>
+                                                setData("name", e.target.value)
+                                            }
+                                            className="flex-grow"
+                                        />
+                                    </div>
+                                    <div className="mb-4">
+                                        <Label htmlFor="picture">
+                                            Upload 3D Vista
+                                        </Label>
+                                        <Input
+                                            id="picture"
+                                            type="file"
+                                            name="file"
+                                            accept="*zip*"
+                                            onChange={(e) => {
+                                                if (e.target.files) {
+                                                    setData(
+                                                        "file",
+                                                        e.target.files[0]
+                                                    );
                                                 }
-                                            >
-                                                <Pencil className="h-4 w-4" />
-                                                Edit
-                                            </Button>
-                                            <AlertDialog>
-                                                <AlertDialogTrigger asChild>
-                                                    <Button className="flex-1 bg-red-600">
-                                                        <Trash2 className="h-4 w-4" />
-                                                        Hapus
-                                                    </Button>
-                                                </AlertDialogTrigger>
-                                                <AlertDialogContent>
-                                                    <AlertDialogHeader>
-                                                        <AlertDialogTitle>
-                                                            Apakah kamu yakin?
-                                                        </AlertDialogTitle>
-                                                        <AlertDialogDescription>
-                                                            Tindakan ini tidak
-                                                            dapat dibatalkan.
-                                                            Ini akan menghapus
-                                                            ruangan "{room.name}
-                                                            " secara permanen
-                                                            dan menghapusnya
-                                                            dari server kami.
-                                                        </AlertDialogDescription>
-                                                    </AlertDialogHeader>
-                                                    <AlertDialogFooter>
-                                                        <AlertDialogCancel>
-                                                            Batal
-                                                        </AlertDialogCancel>
-                                                        <AlertDialogAction
-                                                            onClick={() =>
-                                                                handleDelete(
-                                                                    room.id,
-                                                                    room.name
-                                                                )
-                                                            }
-                                                        >
+                                            }}
+                                        />
+                                        <InputError
+                                            message={errors.file}
+                                            className="mt-2"
+                                        />
+                                    </div>
+                                    <div className="mb-4">
+                                        <Label htmlFor="picture">
+                                            Upload Cover
+                                        </Label>
+                                        <Input
+                                            id="picture"
+                                            type="file"
+                                            name="cover"
+                                            accept="image/*"
+                                            onChange={(e) => {
+                                                if (e.target.files) {
+                                                    setData(
+                                                        "cover",
+                                                        e.target.files[0]
+                                                    );
+                                                }
+                                            }}
+                                        />
+                                        <InputError
+                                            message={errors.cover}
+                                            className="mt-2"
+                                        />
+                                    </div>
+
+                                    <div className="flex justify-end items-center space-x-4">
+                                        <Button variant="secondary">
+                                            Batal
+                                        </Button>
+                                        <Button
+                                            type="submit"
+                                            disabled={processing}
+                                        >
+                                            <Plus className="h-4 w-4" />
+                                            <span className="ml-2">
+                                                {!!editedRoom
+                                                    ? "Edit"
+                                                    : "Tambah"}
+                                            </span>
+                                        </Button>
+                                    </div>
+                                </form>
+                            </CardContent>
+                            <CardHeader>
+                                <CardTitle>Daftar Ruangan</CardTitle>
+                            </CardHeader>
+                            <CardContent className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                                {rooms.length === 0 && (
+                                    <p className="text-center">
+                                        Tidak ada ruangan
+                                    </p>
+                                )}
+                                {rooms.map((room) => (
+                                    <Card
+                                        key={room.id}
+                                        className="flex flex-col overflow-hidden"
+                                    >
+                                        <div
+                                            className="aspect-w-1 aspect-h-1 w-full relative transition-all overflow-hidden hover:scale-105"
+                                            style={{
+                                                backgroundImage: `url('${room.cover}')`,
+                                                height: "200px",
+                                                backgroundSize: "cover",
+                                                backgroundPosition: "center",
+                                            }}
+                                        ></div>
+                                        <CardContent className="p-4 flex-grow">
+                                            <h2 className="text-lg font-semibold mb-2">
+                                                {room.name}
+                                            </h2>
+                                            {/* <p className="text-sm text-gray-500">
+                                                {room.description}
+                                            </p> */}
+                                        </CardContent>
+                                        <CardFooter className="p-4 pt-0 mt-auto">
+                                            <div className="flex w-full space-x-2">
+                                                <Button
+                                                    className="flex-1 bg-green-700"
+                                                    onClick={() =>
+                                                        setEditedRoom(room)
+                                                    }
+                                                >
+                                                    <Pencil className="h-4 w-4" />
+                                                    Edit
+                                                </Button>
+                                                <AlertDialog>
+                                                    <AlertDialogTrigger asChild>
+                                                        <Button className="flex-1 bg-red-600">
+                                                            <Trash2 className="h-4 w-4" />
                                                             Hapus
-                                                        </AlertDialogAction>
-                                                    </AlertDialogFooter>
-                                                </AlertDialogContent>
-                                            </AlertDialog>
-                                        </div>
-                                    </CardFooter>
-                                </Card>
-                            ))}
-                        </CardContent>
-                    </Card>
+                                                        </Button>
+                                                    </AlertDialogTrigger>
+                                                    <AlertDialogContent>
+                                                        <AlertDialogHeader>
+                                                            <AlertDialogTitle>
+                                                                Apakah kamu
+                                                                yakin?
+                                                            </AlertDialogTitle>
+                                                            <AlertDialogDescription>
+                                                                Tindakan ini
+                                                                tidak dapat
+                                                                dibatalkan. Ini
+                                                                akan menghapus
+                                                                ruangan "
+                                                                {room.name}"
+                                                                secara permanen
+                                                                dan menghapusnya
+                                                                dari server
+                                                                kami.
+                                                            </AlertDialogDescription>
+                                                        </AlertDialogHeader>
+                                                        <AlertDialogFooter>
+                                                            <AlertDialogCancel>
+                                                                Batal
+                                                            </AlertDialogCancel>
+                                                            <AlertDialogAction
+                                                                onClick={() =>
+                                                                    handleDelete(
+                                                                        room.id,
+                                                                        room.name
+                                                                    )
+                                                                }
+                                                            >
+                                                                Hapus
+                                                            </AlertDialogAction>
+                                                        </AlertDialogFooter>
+                                                    </AlertDialogContent>
+                                                </AlertDialog>
+                                            </div>
+                                        </CardFooter>
+                                    </Card>
+                                ))}
+                            </CardContent>
+                        </Card>
+                    </div>
                 </div>
-            </div>
-        </AuthenticatedLayout>
+            </AuthenticatedLayout>
+            <Footer />
+        </>
     );
 }

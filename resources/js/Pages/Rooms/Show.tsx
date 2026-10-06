@@ -1,14 +1,7 @@
 import Navbar from "@/Components/Navbar";
 import { Head, usePage } from "@inertiajs/react";
 import Panorama360 from "../PanoramaVista";
-import { PageProps } from "@/types";
-import { HelpCircle } from "lucide-react";
-import { Button } from "@/Components/ui/button";
-import {
-    Popover,
-    PopoverContent,
-    PopoverTrigger,
-} from "@/Components/ui/popover";
+import { PageProps } from "@/types/index";
 
 export default function PanoramaRuangan() {
     const { room, image } =

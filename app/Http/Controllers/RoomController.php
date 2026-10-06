@@ -28,7 +28,6 @@ class RoomController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'file' => ['required', 'file', 'mimes:zip'], // Only ZIP files
             'cover' => ['required', 'image', 'mimes:jpg,jpeg,png', 'max:5120'], // Only image files
-            'description' => ['nullable', 'string', 'max:1000'],
         ]);
 
         // Generate folder name based on room name
@@ -84,7 +83,6 @@ class RoomController extends Controller
             'name' => $request->name,
             'image' => $imagePath ?? null,
             'cover' => $coverPath ?? null,
-            'description' => $request->description,
         ]);
 
         return redirect()->back()->with('success', 'Room created successfully with cover image!');
@@ -107,7 +105,6 @@ class RoomController extends Controller
             'name' => 'required',
             'file' => ['nullable', 'file', 'mimes:zip'],
             'cover' => ['nullable', 'image', 'mimes:jpg,jpeg,png', 'max:5120'],
-            'description' => ['nullable', 'string', 'max:1000'],
         ]);
 
         // Generate folder name based on the updated room name
@@ -168,7 +165,6 @@ class RoomController extends Controller
 
         // ✅ Update room details
         $room->name = $request->name;
-        $room->description = $request->description;
 
         // ✅ Save changes to the database
         $room->save();
@@ -194,7 +190,7 @@ class RoomController extends Controller
         $room->delete();
 
         return redirect()->back()->with('success', 'Room deleted successfully!');
-}
+    }
 
     // Helper function to delete a folder and its contents
     private function deleteFolder($folderPath)

@@ -1,4 +1,4 @@
-import { ImgHTMLAttributes, SVGAttributes } from "react";
+import { ImgHTMLAttributes} from "react";
 import Logo from "@/assets/logo-uir.png";
 
 export default function ApplicationLogo(
