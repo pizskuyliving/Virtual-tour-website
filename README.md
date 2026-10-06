@@ -1,66 +1,86 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Virtual Tour 360 — Teknik Informatika UIR
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Website virtual tour 360° Prodi Teknik Informatika, Fakultas Teknik, Universitas Islam Riau.
+Dibangun dengan Laravel 11, Inertia, dan React.
 
-## About Laravel
+## Menjalankan di komputer lokal
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+```bash
+composer install
+npm install
+cp .env.example .env        # lalu isi pengaturan database
+php artisan key:generate
+php artisan migrate
+php artisan serve           # terminal 1
+npm run dev                 # terminal 2
+```
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+Buka `http://localhost:8000`.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## Akun admin
 
-## Learning Laravel
+Pendaftaran akun publik ditutup. Hanya admin yang bisa membuka Dashboard dan mengelola ruangan.
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+```bash
+# Membuat akun admin baru (akan ditanya nama dan password),
+# atau menjadikan akun yang sudah ada sebagai admin
+php artisan user:make-admin email@contoh.com
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+# Mencabut akses admin
+php artisan user:make-admin email@contoh.com --revoke
+```
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+Lupa password? Gunakan menu "Forgot password" di halaman login (email harus sudah diatur di `.env`), atau:
 
-## Laravel Sponsors
+```bash
+php artisan tinker --execute="App\Models\User::where('email','email@contoh.com')->update(['password'=>bcrypt('PasswordBaru')]);"
+```
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+## Mengelola ruangan
 
-### Premium Partners
+- Tambah ruangan dari Dashboard: isi nama, upload ZIP hasil export 3DVista (berisi `index.htm`), dan foto cover.
+- ZIP maksimal 200 MB (maksimal 1 GB setelah diekstrak). ZIP yang berisi file yang bisa dijalankan server
+  (`.php`, `.phtml`, `.htaccess`, dan sejenisnya) akan ditolak.
+- Urutan ruangan di halaman pengunjung diatur dengan tombol panah di Dashboard.
+- Folder tour di `public/rooms3D` yang belum terdaftar di database bisa didaftarkan dengan:
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+```bash
+php artisan rooms:import
+```
 
-## Contributing
+## Menjalankan test
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+Test memakai database terpisah (`virtaltour360_test`, diatur di `.env.testing`) karena test mengosongkan database.
+Buat database itu sekali, lalu:
 
-## Code of Conduct
+```bash
+php artisan test
+```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+Jangan arahkan `.env.testing` ke database utama.
 
-## Security Vulnerabilities
+## Checklist sebelum website online
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+Ubah di `.env` server:
 
-## License
+```dotenv
+APP_ENV=production
+APP_DEBUG=false
+APP_URL=https://domain-anda
+```
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+Lalu jalankan:
+
+```bash
+composer install --no-dev --optimize-autoloader
+npm run build
+php artisan migrate --force
+php artisan config:cache
+php artisan route:cache
+php artisan view:cache
+```
+
+Catatan:
+- Arahkan document root web server ke folder `public/`, bukan ke root proyek.
+- Pastikan `upload_max_filesize` dan `post_max_size` di PHP minimal 200M agar upload tour berfungsi.
+- Gunakan password database yang kuat (jangan `root` tanpa password).

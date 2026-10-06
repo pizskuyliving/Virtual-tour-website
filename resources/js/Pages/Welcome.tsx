@@ -60,7 +60,7 @@ export default function Home() {
                             360 Virtual Tour
                         </p>
                         {rooms.length > 0 && (
-                            <Link href="/Rooms">
+                            <Link href={route("room.index")}>
                                 <Button
                                     className="bg-white text-emerald-700 font-semibold py-3 px-6 text-lg rounded-full shadow-lg hover:shadow-xl transform transition-all duration-300 ease-in-out hover:scale-105 focus:outline-none focus:ring-4 focus:ring-white focus:ring-opacity-50 flex items-center justify-center"
                                     data-aos="flip-up"

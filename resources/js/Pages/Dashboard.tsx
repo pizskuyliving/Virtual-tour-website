@@ -24,14 +24,16 @@ import { Input } from "@/Components/ui/input";
 import { Label } from "@/Components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { PageProps } from "@/types/index";
-import { Head, useForm, usePage } from "@inertiajs/react";
-import { Pencil, Plus, Trash2 } from "lucide-react";
+import { Head, router, useForm, usePage } from "@inertiajs/react";
+import { ArrowDown, ArrowUp, Pencil, Plus, Trash2 } from "lucide-react";
 import { FormEvent, useEffect, useState } from "react";
 
 export default function Dashboard() {
     const { rooms } = usePage<PageProps<{ rooms: Room[] }>>().props;
     const { toast } = useToast();
     const [editedRoom, setEditedRoom] = useState<Room | null>(null);
+    // Changing the key remounts the form, which also clears the file inputs
+    const [formKey, setFormKey] = useState(0);
     const {
         data,
         setData,
@@ -40,16 +42,15 @@ export default function Dashboard() {
         errors,
         processing,
         reset,
+        clearErrors,
     } = useForm<{
         name: string;
         file: File | null;
         cover: File | null;
-        description: string;
     }>({
         name: "",
         file: null,
         cover: null,
-        description: "",
     });
 
     useEffect(() => {
@@ -58,7 +59,6 @@ export default function Dashboard() {
                 name: editedRoom.name,
                 file: null,
                 cover: null,
-                description: editedRoom.description,
             });
         }
     }, [editedRoom]);
@@ -67,35 +67,48 @@ export default function Dashboard() {
         e.preventDefault();
         if (!!editedRoom) {
             post(route("room.update", editedRoom?.id), {
-                onFinish: () => {
+                onSuccess: () => {
                     toast({
                         title: `${editedRoom.name} updated`,
                         description: `Ruangan ${editedRoom.name} berhasil diperbarui.`,
                     });
                     setEditedRoom(null);
-                    reset("name");
-                    reset("file");
-                    reset("cover");
+                    reset();
+                    setFormKey((key) => key + 1);
                 },
             });
         } else {
             post(route("room.store"), {
-                onFinish: () => {
+                onSuccess: () => {
                     toast({
                         title: `${data.name} added`,
                         description: `Ruangan ${data.name} berhasil ditambahkan.`,
                     });
-                    reset("name");
-                    reset("file");
-                    reset("cover");
+                    reset();
+                    setFormKey((key) => key + 1);
                 },
             });
         }
     };
 
+    const handleCancel = () => {
+        setEditedRoom(null);
+        reset();
+        clearErrors();
+        setFormKey((key) => key + 1);
+    };
+
+    const handleMove = (id: number, direction: "up" | "down") => {
+        router.post(
+            route("room.move", id.toString()),
+            { direction },
+            { preserveScroll: true }
+        );
+    };
+
     const handleDelete = (id: number, room: string) => {
         destroy(route("room.destroy", id.toString()), {
-            onFinish: () => {
+            onSuccess: () => {
                 toast({
                     title: `${room} deleted`,
                     description: `${room} berhasil dihapus.`,
@@ -126,13 +139,15 @@ export default function Dashboard() {
                             </CardHeader>
                             <CardContent>
                                 <form
+                                    key={formKey}
                                     onSubmit={handleAdd}
                                     className="flex flex-col mb-4  max-w-80"
                                     encType="multipart/form-data"
                                 >
                                     <div className="mb-4">
-                                        <Label htmlFor="picture">Ruangan</Label>
+                                        <Label htmlFor="name">Ruangan</Label>
                                         <Input
+                                            id="name"
                                             type="text"
                                             placeholder="Nama Ruangan"
                                             required
@@ -143,6 +158,10 @@ export default function Dashboard() {
                                             }
                                             className="flex-grow"
                                         />
+                                        <InputError
+                                            message={errors.name}
+                                            className="mt-2"
+                                        />
                                     </div>
                                     <div className="mb-4">
                                         <Label htmlFor="picture">
@@ -152,7 +171,7 @@ export default function Dashboard() {
                                             id="picture"
                                             type="file"
                                             name="file"
-                                            accept="*zip*"
+                                            accept=".zip"
                                             onChange={(e) => {
                                                 if (e.target.files) {
                                                     setData(
@@ -168,11 +187,11 @@ export default function Dashboard() {
                                         />
                                     </div>
                                     <div className="mb-4">
-                                        <Label htmlFor="picture">
+                                        <Label htmlFor="cover">
                                             Upload Cover
                                         </Label>
                                         <Input
-                                            id="picture"
+                                            id="cover"
                                             type="file"
                                             name="cover"
                                             accept="image/*"
@@ -192,7 +211,11 @@ export default function Dashboard() {
                                     </div>
 
                                     <div className="flex justify-end items-center space-x-4">
-                                        <Button variant="secondary">
+                                        <Button
+                                            type="button"
+                                            variant="secondary"
+                                            onClick={handleCancel}
+                                        >
                                             Batal
                                         </Button>
                                         <Button
@@ -218,7 +241,7 @@ export default function Dashboard() {
                                         Tidak ada ruangan
                                     </p>
                                 )}
-                                {rooms.map((room) => (
+                                {rooms.map((room, index) => (
                                     <Card
                                         key={room.id}
                                         className="flex flex-col overflow-hidden"
@@ -233,12 +256,41 @@ export default function Dashboard() {
                                             }}
                                         ></div>
                                         <CardContent className="p-4 flex-grow">
-                                            <h2 className="text-lg font-semibold mb-2">
-                                                {room.name}
-                                            </h2>
-                                            {/* <p className="text-sm text-gray-500">
-                                                {room.description}
-                                            </p> */}
+                                            <div className="flex items-start justify-between gap-2">
+                                                <h2 className="text-lg font-semibold mb-2">
+                                                    {index + 1}. {room.name}
+                                                </h2>
+                                                <div className="flex shrink-0 gap-1">
+                                                    <Button
+                                                        type="button"
+                                                        variant="outline"
+                                                        size="icon"
+                                                        className="h-8 w-8"
+                                                        title="Pindah ke atas"
+                                                        aria-label={`Pindahkan ${room.name} ke atas`}
+                                                        disabled={index === 0}
+                                                        onClick={() =>
+                                                            handleMove(room.id, "up")
+                                                        }
+                                                    >
+                                                        <ArrowUp className="h-4 w-4" />
+                                                    </Button>
+                                                    <Button
+                                                        type="button"
+                                                        variant="outline"
+                                                        size="icon"
+                                                        className="h-8 w-8"
+                                                        title="Pindah ke bawah"
+                                                        aria-label={`Pindahkan ${room.name} ke bawah`}
+                                                        disabled={index === rooms.length - 1}
+                                                        onClick={() =>
+                                                            handleMove(room.id, "down")
+                                                        }
+                                                    >
+                                                        <ArrowDown className="h-4 w-4" />
+                                                    </Button>
+                                                </div>
+                                            </div>
                                         </CardContent>
                                         <CardFooter className="p-4 pt-0 mt-auto">
                                             <div className="flex w-full space-x-2">

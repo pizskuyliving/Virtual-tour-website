@@ -85,7 +85,7 @@ export default function RoomsHome() {
     );
 
     const handleImageLoad = useCallback((roomName: string) => {
-        if (process.env.NODE_ENV === "development") {
+        if (import.meta.env.DEV) {
             console.log(`Image loaded for room: ${roomName}`);
         }
     }, []);

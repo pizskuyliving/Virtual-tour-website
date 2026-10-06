@@ -127,16 +127,6 @@ export default function Login({
                                 LOGIN NOW
                             </PrimaryButton>
                         </div>
-
-                        <div className="mt-8 text-sm text-gray-600 text-center dark:text-gray-400">
-                            Don't have an account?
-                            <Link
-                                href={route("register")} // Assuming you have a register route
-                                className="ms-1 text-sm text-indigo-600 underline hover:text-indigo-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:text-indigo-400 dark:hover:text-indigo-200"
-                            >
-                                Register
-                            </Link>
-                        </div>
                     </form>
                 </div>
             </GuestLayout>
